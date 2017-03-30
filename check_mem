@@ -1,0 +1,25 @@
+#!/bin/bash
+OK=0
+WARN=1
+CRITICAL=2
+UNKNOWN=3
+ps -ef|grep mem_monitor_agent|grep -v grep >/dev/null
+ret=$?
+if [ $ret -ne 0 ]
+then
+  echo "memory monitoring agent is not running!" 
+  /etc/init.d/memon_agent restart
+  exit $WARN
+else
+  ErrFile="/tmp/mem_err"
+  if [ ! -f $ErrFile ]
+  then
+    echo "Memory is OK"
+    exit $OK
+  else
+    err_msg=`cat $ErrFile`
+    echo "Memory Error:"$err_msg
+    exit $CRITICAL
+  fi
+
+fi
